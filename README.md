@@ -1,21 +1,29 @@
 # @lumin/react-native
 
-Lumin SDK for React Native apps.
+The Lumin SDK for React Native apps.
 
 ## Installation
 
 ```sh
-npm install @lumin/react-native
+npm install @lumin/react-native @react-native-async-storage/async-storage
+```
+
+Then run:
+
+```sh
+npx pod-install
 ```
 
 ## Usage
 
 ```js
-import { multiply } from '@lumin/react-native';
+import { Lumin } from '@lumin/react-native';
 
 // ...
 
-const result = await multiply(3, 7);
+const lumin = new Lumin("<yourLuminToken>", "<environment>");
+
+lumin.logInfo();
 ```
 
 ## Contributing
