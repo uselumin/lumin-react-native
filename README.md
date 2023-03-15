@@ -21,9 +21,9 @@ import { Lumin } from '@lumin/react-native';
 
 // ...
 
-const lumin = new Lumin("<yourLuminToken>", "<environment>");
+const lumin = new Lumin("<yourLuminToken>");
 
-lumin.logInfo();
+lumin.init();
 ```
 
 ## Contributing
