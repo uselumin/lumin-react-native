@@ -1,5 +1,5 @@
 {
-  "name": "@lumin/react-native",
+  "name": "@uselumin/react-native",
   "version": "0.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -47,9 +47,6 @@
     "url": "https://github.com/uselumin/lumin-react-native/issues"
   },
   "homepage": "https://github.com/uselumin/lumin-react-native#readme",
-  "publishConfig": {
-    "registry": "http://localhost:4873"
-  },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.2.2",
