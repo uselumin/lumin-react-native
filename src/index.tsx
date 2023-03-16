@@ -11,7 +11,8 @@ import startOfYear from 'date-fns/startOfYear';
 
 interface Info {
   platform: string;
-  version: string;
+  platformVersion: string;
+  luminVersion: string;
 }
 
 export interface LuminConfig {
@@ -50,10 +51,11 @@ export class Lumin {
     this.sessionStartTime = new Date();
     this.info = {
       platform: Platform.OS,
-      version:
+      platformVersion:
         typeof Platform.Version === 'string'
           ? Platform.Version
           : Platform.Version.toString(),
+      luminVersion: '0.4.0',
     };
   }
 
