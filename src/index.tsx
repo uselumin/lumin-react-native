@@ -24,12 +24,16 @@ export interface LuminConfig {
     yearlyActiveUser?: number;
   };
   url?: string;
+  logResponse?: boolean;
+  logError?: boolean;
 }
 
 const defaultConfig: LuminConfig = {
   environment: 'default',
   automaticallyTrackActiveUsers: true,
   url: 'https://app.uselumin.co',
+  logResponse: false,
+  logError: true,
 };
 
 export class Lumin {
@@ -76,6 +80,8 @@ export class Lumin {
 
       this.appState = nextAppState;
     });
+
+    this.setFirstOpenTime();
 
     if (this.config.automaticallyTrackActiveUsers) {
       this.trackActiveUser();
@@ -232,11 +238,15 @@ export class Lumin {
     })
       .then((res) => {
         res.json().then((json) => {
-          console.log(json);
+          if (this.config.logResponse) {
+            console.log(json);
+          }
         });
       })
       .catch((err) => {
-        console.log(err);
+        if (this.config.logError) {
+          console.log(err);
+        }
       });
   }
 
