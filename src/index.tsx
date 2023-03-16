@@ -239,4 +239,15 @@ export class Lumin {
         console.log(err);
       });
   }
+
+  async clearLuminItemsFromAsyncStorage() {
+    await Promise.all([
+      AsyncStorage.removeItem('lumin_first_open_time'),
+      AsyncStorage.removeItem('lumin_end_of_last_session'),
+      AsyncStorage.removeItem('lumin_last_dau_tracked'),
+      AsyncStorage.removeItem('lumin_last_wau_tracked'),
+      AsyncStorage.removeItem('lumin_last_mau_tracked'),
+      AsyncStorage.removeItem('lumin_last_yau_tracked'),
+    ]);
+  }
 }
