@@ -82,7 +82,7 @@ export class Lumin {
         typeof Platform.Version === 'string'
           ? Platform.Version
           : Platform.Version.toString(),
-      luminVersion: '0.4.0',
+      luminVersion: '0.4.2',
     };
   }
 
