@@ -29,6 +29,15 @@ export interface LuminConfig {
   logError?: boolean;
 }
 
+type AsyncStorageKeys = {
+  firstOpenTime: string;
+  endOfLastSession: string;
+  lastDauTracked: string;
+  lastWauTracked: string;
+  lastMauTracked: string;
+  lastYauTracked: string;
+};
+
 const defaultConfig: LuminConfig = {
   environment: 'default',
   automaticallyTrackActiveUsers: true,
@@ -38,14 +47,32 @@ const defaultConfig: LuminConfig = {
 };
 
 export class Lumin {
+  id: string;
   token: string;
   config: LuminConfig;
   appState: AppStateStatus;
   sessionStartTime: Date;
   info: Info;
+  asyncStorageKeys: AsyncStorageKeys;
 
   constructor(token: string, config: LuminConfig = defaultConfig) {
-    this.token = token;
+    const [appId, appToken] = token.trim().split(':');
+
+    if (!appId || !appToken) {
+      throw new Error('Lumin token malformed!');
+    }
+
+    this.asyncStorageKeys = {
+      firstOpenTime: `lumin_${appId}_first_open_time`,
+      endOfLastSession: `lumin_${appId}_end_of_last_session`,
+      lastDauTracked: `lumin_${appId}_last_dau_tracked`,
+      lastWauTracked: `lumin_${appId}_last_wau_tracked`,
+      lastMauTracked: `lumin_${appId}_last_mau_tracked`,
+      lastYauTracked: `lumin_${appId}_last_yau_tracked`,
+    };
+
+    this.id = appId;
+    this.token = appToken;
     this.config = { ...defaultConfig, ...config };
     this.appState = AppState.currentState;
     this.sessionStartTime = new Date();
@@ -96,7 +123,7 @@ export class Lumin {
     this.sessionStartTime = new Date();
 
     const lastSessionEndTime = await AsyncStorage.getItem(
-      'lumin_end_of_last_session'
+      this.asyncStorageKeys.endOfLastSession
     );
 
     let diff = null;
@@ -116,13 +143,19 @@ export class Lumin {
       duration: diff,
     });
 
-    AsyncStorage.setItem('lumin_end_of_last_session', new Date().toString());
+    AsyncStorage.setItem(
+      this.asyncStorageKeys.endOfLastSession,
+      new Date().toString()
+    );
   }
 
   protected setFirstOpenTime() {
     AsyncStorage.getItem('lumin_first_open_time').then((firstOpenTime) => {
       if (!firstOpenTime) {
-        AsyncStorage.setItem('lumin_first_open_time', new Date().toString());
+        AsyncStorage.setItem(
+          this.asyncStorageKeys.firstOpenTime,
+          new Date().toString()
+        );
 
         this.track('FIRST_OPEN');
       }
@@ -130,7 +163,7 @@ export class Lumin {
   }
 
   protected async getFirstOpenTime(): Promise<Date | null> {
-    return AsyncStorage.getItem('lumin_first_open_time').then(
+    return AsyncStorage.getItem(this.asyncStorageKeys.firstOpenTime).then(
       (firstOpenTime) => {
         if (firstOpenTime) {
           return new Date(firstOpenTime);
@@ -149,7 +182,9 @@ export class Lumin {
   }
 
   protected async trackDailyActiveUser() {
-    const lastTimeActive = await AsyncStorage.getItem('lumin_last_dau_tracked');
+    const lastTimeActive = await AsyncStorage.getItem(
+      this.asyncStorageKeys.lastDauTracked
+    );
 
     if (lastTimeActive) {
       const timeCondition = this.config.trackingIntervals?.dailyActiveUser
@@ -159,16 +194,24 @@ export class Lumin {
 
       if (timeCondition) {
         this.track('DAILY_ACTIVE_USER');
-        AsyncStorage.setItem('lumin_last_dau_tracked', new Date().toString());
+        AsyncStorage.setItem(
+          this.asyncStorageKeys.lastDauTracked,
+          new Date().toString()
+        );
       }
     } else {
       this.track('DAILY_ACTIVE_USER');
-      AsyncStorage.setItem('lumin_last_dau_tracked', new Date().toString());
+      AsyncStorage.setItem(
+        this.asyncStorageKeys.lastDauTracked,
+        new Date().toString()
+      );
     }
   }
 
   protected async trackWeeklyActiveUser() {
-    const lastWauTrack = await AsyncStorage.getItem('lumin_last_wau_tracked');
+    const lastWauTrack = await AsyncStorage.getItem(
+      this.asyncStorageKeys.lastWauTracked
+    );
 
     if (lastWauTrack) {
       const timeCondition = this.config.trackingIntervals?.weeklyActiveUser
@@ -178,16 +221,24 @@ export class Lumin {
 
       if (timeCondition) {
         this.track('WEEKLY_ACTIVE_USER');
-        AsyncStorage.setItem('lumin_last_wau_tracked', new Date().toString());
+        AsyncStorage.setItem(
+          this.asyncStorageKeys.lastWauTracked,
+          new Date().toString()
+        );
       }
     } else {
       this.track('WEEKLY_ACTIVE_USER');
-      AsyncStorage.setItem('lumin_last_wau_tracked', new Date().toString());
+      AsyncStorage.setItem(
+        this.asyncStorageKeys.lastWauTracked,
+        new Date().toString()
+      );
     }
   }
 
   protected async trackMonthlyActiveUser() {
-    const lastMauTrack = await AsyncStorage.getItem('lumin_last_mau_tracked');
+    const lastMauTrack = await AsyncStorage.getItem(
+      this.asyncStorageKeys.lastMauTracked
+    );
 
     if (lastMauTrack) {
       const timeCondition = this.config.trackingIntervals?.monthlyActiveUser
@@ -197,17 +248,25 @@ export class Lumin {
 
       if (timeCondition) {
         this.track('MONTHLY_ACTIVE_USER');
-        AsyncStorage.setItem('lumin_last_mau_tracked', new Date().toString());
+        AsyncStorage.setItem(
+          this.asyncStorageKeys.lastMauTracked,
+          new Date().toString()
+        );
       }
     } else {
       this.track('MONTHLY_ACTIVE_USER');
 
-      AsyncStorage.setItem('lumin_last_mau_tracked', new Date().toString());
+      AsyncStorage.setItem(
+        this.asyncStorageKeys.lastMauTracked,
+        new Date().toString()
+      );
     }
   }
 
   protected async trackYearlyActiveUser() {
-    const lastYauTrack = await AsyncStorage.getItem('lumin_last_yau_tracked');
+    const lastYauTrack = await AsyncStorage.getItem(
+      this.asyncStorageKeys.lastYauTracked
+    );
 
     if (lastYauTrack) {
       const timeCondition = this.config.trackingIntervals?.yearlyActiveUser
@@ -217,11 +276,17 @@ export class Lumin {
 
       if (timeCondition) {
         this.track('YEARLY_ACTIVE_USER');
-        AsyncStorage.setItem('lumin_last_yau_tracked', new Date().toString());
+        AsyncStorage.setItem(
+          this.asyncStorageKeys.lastYauTracked,
+          new Date().toString()
+        );
       }
     } else {
       this.track('YEARLY_ACTIVE_USER');
-      AsyncStorage.setItem('lumin_last_yau_tracked', new Date().toString());
+      AsyncStorage.setItem(
+        this.asyncStorageKeys.lastYauTracked,
+        new Date().toString()
+      );
     }
   }
 
@@ -254,12 +319,12 @@ export class Lumin {
 
   async clearLuminItemsFromAsyncStorage() {
     await Promise.all([
-      AsyncStorage.removeItem('lumin_first_open_time'),
-      AsyncStorage.removeItem('lumin_end_of_last_session'),
-      AsyncStorage.removeItem('lumin_last_dau_tracked'),
-      AsyncStorage.removeItem('lumin_last_wau_tracked'),
-      AsyncStorage.removeItem('lumin_last_mau_tracked'),
-      AsyncStorage.removeItem('lumin_last_yau_tracked'),
+      AsyncStorage.removeItem(this.asyncStorageKeys.firstOpenTime),
+      AsyncStorage.removeItem(this.asyncStorageKeys.endOfLastSession),
+      AsyncStorage.removeItem(this.asyncStorageKeys.lastDauTracked),
+      AsyncStorage.removeItem(this.asyncStorageKeys.lastWauTracked),
+      AsyncStorage.removeItem(this.asyncStorageKeys.lastMauTracked),
+      AsyncStorage.removeItem(this.asyncStorageKeys.lastYauTracked),
     ]);
   }
 }
