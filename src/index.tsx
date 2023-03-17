@@ -55,7 +55,7 @@ export class Lumin {
   info: Info;
   asyncStorageKeys: AsyncStorageKeys;
 
-  constructor(token: string, config: LuminConfig = defaultConfig) {
+  constructor(token: string, config: LuminConfig = {}) {
     const [appId, appToken] = token.trim().split(':');
 
     if (!appId || !appToken) {
@@ -151,16 +151,18 @@ export class Lumin {
   }
 
   protected setFirstOpenTime() {
-    AsyncStorage.getItem('lumin_first_open_time').then((firstOpenTime) => {
-      if (!firstOpenTime) {
-        AsyncStorage.setItem(
-          this.asyncStorageKeys.firstOpenTime,
-          new Date().toString()
-        );
+    AsyncStorage.getItem(this.asyncStorageKeys.firstOpenTime).then(
+      (firstOpenTime) => {
+        if (!firstOpenTime) {
+          AsyncStorage.setItem(
+            this.asyncStorageKeys.firstOpenTime,
+            new Date().toString()
+          );
 
-        this.track('FIRST_OPEN');
+          this.track('FIRST_OPEN');
+        }
       }
-    });
+    );
   }
 
   protected async getFirstOpenTime(): Promise<Date | null> {
