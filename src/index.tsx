@@ -139,6 +139,7 @@ export class Lumin {
 
   protected endSession() {
     const diff = differenceInSeconds(new Date(), this.sessionStartTime);
+
     this.track('SESSION_END', {
       duration: diff,
     });
@@ -193,18 +194,20 @@ export class Lumin {
         : isBefore(new Date(lastTimeActive), startOfToday());
 
       if (timeCondition) {
-        this.track('DAILY_ACTIVE_USER');
+        this.track('DAILY_ACTIVE_USER').then(() => {
+          AsyncStorage.setItem(
+            this.asyncStorageKeys.lastDauTracked,
+            new Date().toString()
+          );
+        });
+      }
+    } else {
+      this.track('DAILY_ACTIVE_USER').then(() => {
         AsyncStorage.setItem(
           this.asyncStorageKeys.lastDauTracked,
           new Date().toString()
         );
-      }
-    } else {
-      this.track('DAILY_ACTIVE_USER');
-      AsyncStorage.setItem(
-        this.asyncStorageKeys.lastDauTracked,
-        new Date().toString()
-      );
+      });
     }
   }
 
@@ -220,18 +223,20 @@ export class Lumin {
         : isBefore(new Date(lastWauTrack), startOfWeek(new Date()));
 
       if (timeCondition) {
-        this.track('WEEKLY_ACTIVE_USER');
+        this.track('WEEKLY_ACTIVE_USER').then(() => {
+          AsyncStorage.setItem(
+            this.asyncStorageKeys.lastWauTracked,
+            new Date().toString()
+          );
+        });
+      }
+    } else {
+      this.track('WEEKLY_ACTIVE_USER').then(() => {
         AsyncStorage.setItem(
           this.asyncStorageKeys.lastWauTracked,
           new Date().toString()
         );
-      }
-    } else {
-      this.track('WEEKLY_ACTIVE_USER');
-      AsyncStorage.setItem(
-        this.asyncStorageKeys.lastWauTracked,
-        new Date().toString()
-      );
+      });
     }
   }
 
@@ -247,19 +252,20 @@ export class Lumin {
         : isBefore(new Date(lastMauTrack), startOfMonth(new Date()));
 
       if (timeCondition) {
-        this.track('MONTHLY_ACTIVE_USER');
+        this.track('MONTHLY_ACTIVE_USER').then(() => {
+          AsyncStorage.setItem(
+            this.asyncStorageKeys.lastMauTracked,
+            new Date().toString()
+          );
+        });
+      }
+    } else {
+      this.track('MONTHLY_ACTIVE_USER').then(() => {
         AsyncStorage.setItem(
           this.asyncStorageKeys.lastMauTracked,
           new Date().toString()
         );
-      }
-    } else {
-      this.track('MONTHLY_ACTIVE_USER');
-
-      AsyncStorage.setItem(
-        this.asyncStorageKeys.lastMauTracked,
-        new Date().toString()
-      );
+      });
     }
   }
 
@@ -275,22 +281,24 @@ export class Lumin {
         : isBefore(new Date(lastYauTrack), startOfYear(new Date()));
 
       if (timeCondition) {
-        this.track('YEARLY_ACTIVE_USER');
+        this.track('YEARLY_ACTIVE_USER').then(() => {
+          AsyncStorage.setItem(
+            this.asyncStorageKeys.lastYauTracked,
+            new Date().toString()
+          );
+        });
+      }
+    } else {
+      this.track('YEARLY_ACTIVE_USER').then(() => {
         AsyncStorage.setItem(
           this.asyncStorageKeys.lastYauTracked,
           new Date().toString()
         );
-      }
-    } else {
-      this.track('YEARLY_ACTIVE_USER');
-      AsyncStorage.setItem(
-        this.asyncStorageKeys.lastYauTracked,
-        new Date().toString()
-      );
+      });
     }
   }
 
-  track(event: string, data: any = {}) {
+  async track(event: string, data: any = {}) {
     fetch(`${this.config.url}/api/events/create`, {
       method: 'POST',
       headers: {
@@ -314,6 +322,8 @@ export class Lumin {
         if (this.config.logError) {
           console.log(err);
         }
+
+        throw err;
       });
   }
 
