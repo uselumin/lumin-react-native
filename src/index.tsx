@@ -329,6 +329,13 @@ export class Lumin {
       });
   }
 
+  async trackCustomEvent(event: string, data: any = {}) {
+    this.track(event, {
+      _custom: true,
+      ...data,
+    });
+  }
+
   async clearLuminItemsFromAsyncStorage() {
     await Promise.all([
       AsyncStorage.removeItem(this.asyncStorageKeys.firstOpenTime),
