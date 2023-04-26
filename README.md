@@ -1,8 +1,10 @@
-# @lumin/react-native
+# @uselumin/react-native
 
 The Lumin SDK for React Native apps.
 
 ## Installation
+
+### Without Expo
 
 ```sh
 npm install @uselumin/react-native @react-native-async-storage/async-storage
@@ -14,6 +16,14 @@ Then run:
 npx pod-install
 ```
 
+### With Expo
+
+```sh
+npx expo install @uselumin/react-native @react-native-async-storage/async-storage
+```
+
+There's no need to run `npx pod-install` when using Expo.
+
 ## Usage
 
 ```js
@@ -24,6 +34,19 @@ import { Lumin } from '@uselumin/react-native';
 const lumin = new Lumin("<yourLuminToken>");
 
 lumin.init();
+```
+
+You can find your app's token in the app's settings on Lumin.
+
+## Sending Custom Events
+
+If you want to send custom events that are then counted and displayed by Lumin, you can use the following function:
+
+```javascript
+lumin.trackCustomEvent("EVENT_NAME", {
+    // ... any additional JSON data you might want to pass.
+    // Lumin doesn't do anything with this data (yet), but it will be saved and part of any data exports.
+});
 ```
 
 ## Why is async-storage needed?
