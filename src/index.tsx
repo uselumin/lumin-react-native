@@ -331,7 +331,7 @@ export class Lumin {
 
   async trackCustomEvent(event: string, data: any = {}) {
     this.track(event, {
-      _custom: true,
+      $custom: true,
       ...data,
     });
   }
